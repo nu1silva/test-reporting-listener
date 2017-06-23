@@ -21,14 +21,14 @@ package org.wso2.qa.testlink;
  * This class is used to hold the constant
  * values of the listener.
  */
-public class Constants {
+class Constants {
 
     /**
      * Testlink result statuses
      */
-    public static final String TL_STATUS_PASS = "PASS";
-    public static final String TL_STATUS_FAIL = "FAIL";
-    public static final String TL_STATUS_SKIP = "SKIP";
-    public static final String TL_STATUS_SUCCESS_PERCENTAGE_FAILURE = "SUCCESS_PERCENTAGE_FAILURE";
-    public static final String TL_STATUS_STARTED = "STARTED";
+    static final String TL_STATUS_PASS = "PASS";
+    static final String TL_STATUS_FAIL = "FAIL";
+    static final String TL_STATUS_SKIP = "SKIP";
+    static final String TL_STATUS_SUCCESS_PERCENTAGE_FAILURE = "SUCCESS_PERCENTAGE_FAILURE";
+    static final String TL_STATUS_STARTED = "STARTED";
 }
