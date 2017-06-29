@@ -19,8 +19,11 @@ package org.wso2.qa.testlink.connector;
 
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.Statement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.wso2.qa.testlink.Util;
 
+import java.io.IOException;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
@@ -30,22 +33,26 @@ import java.sql.SQLException;
  */
 public class Connector {
 
-    Util util = new Util();
+    private Util util = new Util();
+    private final Logger logger = LoggerFactory.getLogger(Connector.class);
 
     /**
      * Insert results to the unit_tests table.
      *
-     * @param component
-     * @param version
-     * @param buildNo
-     * @param platform
-     * @param test
-     * @param executionTime
-     * @param status        @throws ClassNotFoundException
-     * @throws SQLException
+     * @param component     name of the component which the test results will be updated
+     * @param version       version of the component which the test results will be updated
+     * @param buildNo       build number of the current jenkins build
+     * @param platform      platform spec which the tests were executed on
+     * @param test          name of the test should include package name.class name#method name
+     * @param executionTime time taken to execute the test
+     * @param status        status of test execution eg: PASS/FAIL
+     * @throws ClassNotFoundException throws ClassNotFoundException
+     * @throws SQLException           throws SQLException
+     * @throws IOException            throws IOException
      */
-    public void InsertTestData(String component, String version, int buildNo, String platform, String test,
-                               long executionTime, String status) throws ClassNotFoundException, SQLException {
+    public void insertTestData(String component, String version, int buildNo, String platform, String test,
+                               long executionTime, String status)
+            throws ClassNotFoundException, SQLException, IOException {
         Connection conn = null;
         Statement stmt = null;
 
@@ -57,15 +64,21 @@ public class Connector {
                     util.getProperty("connector.jdbc.password"));
             stmt = (Statement) conn.createStatement();
 
-            String query = "INSERT INTO testResults VALUES('" + component + "', '" + version + "',  " + buildNo + ", '" +
-                    test + "', '" + platform + "', NOW(), '" + executionTime + "', '" + status + "')";
+            String query = "INSERT INTO testResults VALUES('" + component + "', '" + version + "',  " + buildNo + ", '"
+                    + test + "', '" + platform + "', NOW(), '" + executionTime + "', '" + status + "')";
 
+            if (logger.isDebugEnabled()) {
+                logger.debug("executing ==> " + query);
+            }
             stmt.executeUpdate(query);
-        } catch (Exception ex) {
-            ex.printStackTrace();
+
         } finally {
-            stmt.close();
-            conn.close();
+            if (stmt != null) {
+                stmt.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
     }
 }

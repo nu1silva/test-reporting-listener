@@ -1,13 +1,13 @@
 /**
  * Copyright (c) 2017, WSO2 Inc. (http://www.wso2.org) All Rights Reserved.
- *
+ * <p>
  * WSO2 Inc. licenses this file to you under the Apache License,
  * Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing,
  * software distributed under the License is distributed on an
  * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -17,6 +17,8 @@
  */
 package org.wso2.qa.testlink;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.testng.ITestResult;
 
 import java.io.FileNotFoundException;
@@ -30,18 +32,19 @@ import java.util.Properties;
  */
 public class Util {
 
-    InputStream inputStream;
-    String value;
+    private InputStream inputStream;
+
+    private final Logger logger = LoggerFactory.getLogger(Util.class);
 
     /**
      * converts the integer value provided by TestNG
      * to PASS, FAIL or SKIPPED.
      *
-     * @param result Integer value sent by TestNG that is mapped as test status
+     * @param resultString Integer value sent by TestNG that is mapped as test status
      * @return String Status that is compatible with Testlink
      */
-    protected String ResultStringConverter(int result) {
-        switch (result) {
+    String resultStringConverter(int resultString) {
+        switch (resultString) {
             case ITestResult.SUCCESS:
                 return Constants.TL_STATUS_PASS;
             case ITestResult.FAILURE:
@@ -61,26 +64,20 @@ public class Util {
      *
      * @param key the key value from the required property.
      * @return the property value for the given key
-     * @throws IOException
+     * @throws IOException throws IOException
      */
     public String getProperty(String key) throws IOException {
-        try {
-            Properties properties = new Properties();
-            inputStream = getClass().getClassLoader().getResourceAsStream("listener.properties");
 
-            if (inputStream != null) {
-                properties.load(inputStream);
-            } else {
-                throw new FileNotFoundException("property file listener.properties not found in the classpath");
-            }
+        Properties properties = new Properties();
+        inputStream = getClass().getClassLoader().getResourceAsStream("listener.properties");
 
-            value = properties.getProperty(key);
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } finally {
-            inputStream.close();
+        if (inputStream != null) {
+            properties.load(inputStream);
+        } else {
+            throw new FileNotFoundException("property file listener.properties not found in the classpath");
         }
-        return value;
+        inputStream.close();
+
+        return properties.getProperty(key);
     }
 }
