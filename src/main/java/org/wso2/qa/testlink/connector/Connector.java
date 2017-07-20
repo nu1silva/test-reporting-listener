@@ -64,8 +64,9 @@ public class Connector {
                     util.getProperty("connector.jdbc.password"));
             stmt = (Statement) conn.createStatement();
 
-            String query = "INSERT INTO testResults VALUES('" + component + "', '" + version + "',  " + buildNo + ", '"
-                    + test + "', '" + platform + "', NOW(), '" + executionTime + "', '" + status + "')";
+            String query = "INSERT INTO " + util.getProperty("connector.jdbc.table") + " " +
+                    "VALUES('" + component + "', '" + version + "',  " + buildNo + ", '" + test + "'," +
+                    " '" + platform + "', NOW(), '" + executionTime + "', '" + status + "')";
 
             if (logger.isDebugEnabled()) {
                 logger.debug("executing ==> " + query);
