@@ -9,6 +9,14 @@ build the listener by giving `mvn clean package` from the source root
 #### Usage of the listener
 Add the following properties in the pom.xml of the project/module that has the tests
 ```xml
+<dependencies>
+    <dependency>
+        <groupId>org.wso2.qa.testlink</groupId>
+        <artifactId>test-reporting-listener</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </dependency>
+</dependencies>
+
 <plugin>
    <groupId>org.apache.maven.plugins</groupId>
    <artifactId>maven-surefire-plugin</artifactId>

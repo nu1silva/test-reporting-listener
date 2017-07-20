@@ -43,6 +43,9 @@ public class TestReporterListener implements IReporter {
     private Connector connector = new Connector();
     private Util util = new Util();
 
+    private int buildNumber = 0;
+    private String platform = null;
+
     private final Logger logger = LoggerFactory.getLogger(TestReporterListener.class);
 
     /**
@@ -62,8 +65,23 @@ public class TestReporterListener implements IReporter {
 
             String componentName = suite.getParameter("component");
             String componentVersion = suite.getParameter("version");
-            String buildNumber = suite.getParameter("buildNumber");
-            String platform = suite.getParameter("platfrom");
+
+            // Check for platform availability
+            if (suite.getParameter("platform").contains("current.platform") ||
+                    suite.getParameter("platform") == null) {
+                platform = "DEFAULT";
+            } else {
+                platform = suite.getParameter("platform");
+            }
+
+            // Check for build number availability
+            if (suite.getParameter("buildNumber").contains("current.build") ||
+                    suite.getParameter("buildNumber") == null) {
+                buildNumber = 1;
+            } else {
+                buildNumber = Integer.parseInt(suite.getParameter("buildNumber"));
+            }
+
 
             if (logger.isDebugEnabled()) {
                 logger.debug("component name : " + componentName);
@@ -71,6 +89,7 @@ public class TestReporterListener implements IReporter {
                 logger.debug("current build : " + buildNumber);
                 logger.debug("platform : " + platform);
             }
+
 
             if (!componentVersion.contains("SNAPSHOT")) {
 
@@ -85,7 +104,7 @@ public class TestReporterListener implements IReporter {
                         logger.debug("storing passed test results to the database");
                     }
                     updateTestResults(testContext.getPassedTests(), componentName, componentVersion,
-                            Integer.parseInt(buildNumber), platform);
+                            buildNumber, platform);
                 }
 
                 if (testContext.getFailedTests().getAllResults().size() > 0) {
@@ -93,7 +112,7 @@ public class TestReporterListener implements IReporter {
                         logger.debug("storing failed test results to the database");
                     }
                     updateTestResults(testContext.getFailedTests(), componentName, componentVersion,
-                            Integer.parseInt(buildNumber), platform);
+                            buildNumber, platform);
                 }
 
                 if (testContext.getSkippedTests().getAllResults().size() > 0) {
@@ -101,9 +120,9 @@ public class TestReporterListener implements IReporter {
                         logger.debug("storing skipped test results to the database");
                     }
                     updateTestResults(testContext.getSkippedTests(), componentName, componentVersion,
-                            Integer.parseInt(buildNumber), platform);
+                            buildNumber, platform);
                 }
-                logger.info("Publishing complete.");
+                logger.info("Result Publishing complete.");
 
             } else {
                 logger.warn("Building a SNAPSHOT version. results will not be published");
