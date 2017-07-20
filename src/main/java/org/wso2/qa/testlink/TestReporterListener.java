@@ -43,7 +43,8 @@ public class TestReporterListener implements IReporter {
     private Connector connector = new Connector();
     private Util util = new Util();
 
-    private int buildNumber = 1;
+    private int buildNumber = 0;
+    private String platform = null;
 
     private final Logger logger = LoggerFactory.getLogger(TestReporterListener.class);
 
@@ -64,9 +65,21 @@ public class TestReporterListener implements IReporter {
 
             String componentName = suite.getParameter("component");
             String componentVersion = suite.getParameter("version");
-            String platform = suite.getParameter("platform");
-            if (suite.getParameter("buildNumber").isEmpty() || suite.getParameter("buildNumber") == null) {
+
+            // Check for platform availability
+            if (suite.getParameter("platform").contains("current.platform") ||
+                    suite.getParameter("platform") == null) {
+                platform = "DEFAULT";
+            } else {
+                platform = suite.getParameter("platform");
+            }
+
+            // Check for build number availability
+            if (suite.getParameter("buildNumber").contains("current.build") ||
+                    suite.getParameter("buildNumber") == null) {
                 buildNumber = 1;
+            } else {
+                buildNumber = Integer.parseInt(suite.getParameter("buildNumber"));
             }
 
 
@@ -76,6 +89,7 @@ public class TestReporterListener implements IReporter {
                 logger.debug("current build : " + buildNumber);
                 logger.debug("platform : " + platform);
             }
+
 
             if (!componentVersion.contains("SNAPSHOT")) {
 
