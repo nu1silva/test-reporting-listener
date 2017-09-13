@@ -44,7 +44,7 @@ Register the following listener and properties in testng.xml
    <parameter name="buildNumber" value="${current.build.number}" />
    <parameter name="platform" value="${current.platform}" />
    <listeners>
-      <listener class-name="org.wso2.qa.testlink.TestReporterListener" />
+      <listener class-name="org.wso2.qa.testlink.TestNgTestReporterListener" />
    </listeners>
    
    <test name="tests">

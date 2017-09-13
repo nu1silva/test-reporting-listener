@@ -21,25 +21,32 @@ import org.junit.runner.Description;
 import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 import org.junit.runner.notification.RunListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+/**
+ *  Main Junit Listener class
+ */
 public class JUnitTestReporterListener extends RunListener {
+
+    private final Logger logger = LoggerFactory.getLogger(JUnitTestReporterListener.class);
 
     private static final Description FAILED = Description.createTestDescription("failed", "FAIL");
     private static final Description SKIPPED = Description.createTestDescription("skipped", "SKIP");
 
     @Override
     public void testRunFinished(Result result) throws Exception {
-        System.out.println("Test run ended with [" + result.getRunCount() + "] tests");
+        logger.debug("Test run ended with [" + result.getRunCount() + "] tests");
     }
 
     @Override
     public void testFinished(Description description) throws Exception {
         if (description.getChildren().contains(FAILED)) {
-            System.out.println(description.getTestClass() + "#" + description.getMethodName() + " | FAIL");
+            logger.info(description.getTestClass() + "#" + description.getMethodName() + " | FAIL");
         } else if (description.getChildren().contains(SKIPPED)) {
-            System.out.println(description.getTestClass() + "#" + description.getMethodName() + " | SKIP");
+            logger.info(description.getTestClass() + "#" + description.getMethodName() + " | SKIP");
         } else {
-            System.out.println(description.getTestClass() + "#" + description.getMethodName() + " | PASS");
+            logger.info(description.getTestClass() + "#" + description.getMethodName() + " | PASS");
         }
     }
 
