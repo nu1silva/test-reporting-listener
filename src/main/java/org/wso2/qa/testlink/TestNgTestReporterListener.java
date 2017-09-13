@@ -38,9 +38,9 @@ import java.util.Map;
 /**
  * Main TestNG listener class.
  */
-public class TestReporterListener implements IReporter {
+public class TestNgTestReporterListener implements IReporter {
 
-    private final Logger logger = LoggerFactory.getLogger(TestReporterListener.class);
+    private final Logger logger = LoggerFactory.getLogger(TestNgTestReporterListener.class);
     private Connector connector = new Connector();
     private Util util = new Util();
     private int buildNumber = 0;
