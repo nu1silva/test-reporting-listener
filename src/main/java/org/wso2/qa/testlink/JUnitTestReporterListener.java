@@ -26,6 +26,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  *  Main Junit Listener class
+ *
+ *  NOTE: At its very early stages.
+ *
  */
 public class JUnitTestReporterListener extends RunListener {
 

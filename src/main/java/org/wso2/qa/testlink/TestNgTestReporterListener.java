@@ -41,10 +41,11 @@ import java.util.Map;
 public class TestNgTestReporterListener implements IReporter {
 
     private final Logger logger = LoggerFactory.getLogger(TestNgTestReporterListener.class);
+
     private Connector connector = new Connector();
     private Util util = new Util();
-    private int buildNumber = 0;
-    private String platform = null;
+
+    private Boolean useSnapshots;
 
     /**
      * Using the listener iterates through each suite to get the results and update
@@ -65,6 +66,7 @@ public class TestNgTestReporterListener implements IReporter {
             String componentVersion = suite.getParameter("version");
 
             // Check for platform availability
+            String platform = null;
             if (suite.getParameter("platform").contains("current.platform") ||
                     suite.getParameter("platform") == null) {
                 platform = "DEFAULT";
@@ -73,13 +75,13 @@ public class TestNgTestReporterListener implements IReporter {
             }
 
             // Check for build number availability
+            int buildNumber = 0;
             if (suite.getParameter("buildNumber").contains("current.build") ||
                     suite.getParameter("buildNumber") == null) {
                 buildNumber = 1;
             } else {
                 buildNumber = Integer.parseInt(suite.getParameter("buildNumber"));
             }
-
 
             if (logger.isDebugEnabled()) {
                 logger.debug("component name : " + componentName);
@@ -88,42 +90,45 @@ public class TestNgTestReporterListener implements IReporter {
                 logger.debug("platform : " + platform);
             }
 
+            // Check to use SNAPSHOT versions or not
+            try {
+                if (componentVersion.contains("SNAPSHOT") && !useSnapshots()) {
+                    logger.warn("Building a SNAPSHOT version. results will not be published");
+                } else {
 
-            if (!componentVersion.contains("SNAPSHOT")) {
+                    Map<String, ISuiteResult> tests = suite.getResults();
 
-                Map<String, ISuiteResult> tests = suite.getResults();
+                    Collection suiteResults = tests.values();
+                    ISuiteResult suiteResult = (ISuiteResult) suiteResults.iterator().next();
+                    ITestContext testContext = suiteResult.getTestContext();
 
-                Collection suiteResults = tests.values();
-                ISuiteResult suiteResult = (ISuiteResult) suiteResults.iterator().next();
-                ITestContext testContext = suiteResult.getTestContext();
-
-                if (testContext.getPassedTests().getAllResults().size() > 0) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("storing passed test results to the database");
+                    if (testContext.getPassedTests().getAllResults().size() > 0) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("storing passed test results to the database");
+                        }
+                        updateTestResults(testContext.getPassedTests(), componentName, componentVersion,
+                                buildNumber, platform);
                     }
-                    updateTestResults(testContext.getPassedTests(), componentName, componentVersion,
-                            buildNumber, platform);
-                }
 
-                if (testContext.getFailedTests().getAllResults().size() > 0) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("storing failed test results to the database");
+                    if (testContext.getFailedTests().getAllResults().size() > 0) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("storing failed test results to the database");
+                        }
+                        updateTestResults(testContext.getFailedTests(), componentName, componentVersion,
+                                buildNumber, platform);
                     }
-                    updateTestResults(testContext.getFailedTests(), componentName, componentVersion,
-                            buildNumber, platform);
-                }
 
-                if (testContext.getSkippedTests().getAllResults().size() > 0) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("storing skipped test results to the database");
+                    if (testContext.getSkippedTests().getAllResults().size() > 0) {
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("storing skipped test results to the database");
+                        }
+                        updateTestResults(testContext.getSkippedTests(), componentName, componentVersion,
+                                buildNumber, platform);
                     }
-                    updateTestResults(testContext.getSkippedTests(), componentName, componentVersion,
-                            buildNumber, platform);
+                    logger.info("Result Publishing complete.");
                 }
-                logger.info("Result Publishing complete.");
-
-            } else {
-                logger.warn("Building a SNAPSHOT version. results will not be published");
+            } catch (IOException e) {
+                logger.error("IO error occurred", e);
             }
         }
     }
@@ -156,5 +161,9 @@ public class TestNgTestReporterListener implements IReporter {
                 logger.error(e.getLocalizedMessage(), e);
             }
         }
+    }
+
+    private Boolean useSnapshots() throws IOException {
+        return Boolean.valueOf(util.getProperty("snapshot.results.enabled"));
     }
 }
