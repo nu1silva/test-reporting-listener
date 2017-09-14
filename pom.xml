@@ -39,6 +39,11 @@
             <version>${testng.version}</version>
         </dependency>
         <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+        <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql.version}</version>
@@ -82,8 +87,9 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <mysql.version>5.1.37</mysql.version>
         <testng.version>6.9.10</testng.version>
+        <junit.version>LATEST</junit.version>
+        <mysql.version>5.1.37</mysql.version>
         <log4j.version>1.2.17</log4j.version>
         <slf4j.version>1.7.21</slf4j.version>
     </properties>

@@ -15,7 +15,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.wso2.qa.testlink;
+package org.wso2.qa.testlink.exception;
 
 /**
  * This class is used to manage exceptions for the listener
