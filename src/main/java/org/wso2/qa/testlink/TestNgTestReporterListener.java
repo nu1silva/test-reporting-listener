@@ -30,6 +30,7 @@ import org.wso2.qa.testlink.connector.Connector;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -146,19 +147,41 @@ public class TestNgTestReporterListener implements IReporter {
                                    int buildNumber, String platform) {
         for (ITestResult testResults : testResultMap.getAllResults()) {
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("storing results {" + componentName + ", " + componentVersion + ", " + buildNumber
-                        + "" + ", " + platform + ", " + testResults.getMethod().getRealClass().getName() + "#"
-                        + testResults.getName() + "," + util.resultStringConverter(testResults.getStatus()) + "}");
-            }
-            try {
-                connector.insertTestData(componentName, componentVersion, buildNumber, platform,
+            // Check to find data driven tests
+            if (testResults.getParameters().length >= 1) {
 
-                        testResults.getMethod().getRealClass().getName() + "#" + testResults.getName(),
-                        testResults.getEndMillis() - testResults.getStartMillis(),
-                        util.resultStringConverter(testResults.getStatus()));
-            } catch (ClassNotFoundException | SQLException | IOException e) {
-                logger.error(e.getLocalizedMessage(), e);
+                if (logger.isDebugEnabled()) {
+                    logger.debug("storing results {" + componentName + ", " + componentVersion + ", " + buildNumber
+                            + "" + ", " + platform + ", " + testResults.getMethod().getRealClass().getName() + "#"
+                            + testResults.getName() + "@" + Arrays.asList(testResults.getParameters()).get(0) + "," +
+                            util.resultStringConverter(testResults.getStatus()) + "}");
+                }
+                try {
+                    connector.insertTestData(componentName, componentVersion, buildNumber, platform,
+
+                            testResults.getMethod().getRealClass().getName() + "#" + testResults.getName() +
+                                    "@" + Arrays.asList(testResults.getParameters()).get(0),
+                            testResults.getEndMillis() - testResults.getStartMillis(),
+                            util.resultStringConverter(testResults.getStatus()));
+                } catch (ClassNotFoundException | SQLException | IOException e) {
+                    logger.error(e.getLocalizedMessage(), e);
+                }
+            } else {
+
+                if (logger.isDebugEnabled()) {
+                    logger.debug("storing results {" + componentName + ", " + componentVersion + ", " + buildNumber
+                            + "" + ", " + platform + ", " + testResults.getMethod().getRealClass().getName() + "#"
+                            + testResults.getName() + "," + util.resultStringConverter(testResults.getStatus()) + "}");
+                }
+                try {
+                    connector.insertTestData(componentName, componentVersion, buildNumber, platform,
+
+                            testResults.getMethod().getRealClass().getName() + "#" + testResults.getName(),
+                            testResults.getEndMillis() - testResults.getStartMillis(),
+                            util.resultStringConverter(testResults.getStatus()));
+                } catch (ClassNotFoundException | SQLException | IOException e) {
+                    logger.error(e.getLocalizedMessage(), e);
+                }
             }
         }
     }
